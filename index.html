@@ -4,48 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>100초 거북목 탈출</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#121212">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="거북목탈출">
+    <link rel="apple-touch-icon" href="icon.png">
+
     <style>
-        body {
-            margin: 0; padding: 0;
-            background-color: #121212;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100vh; text-align: center; overflow: hidden;
-        }
-        h1 { font-size: 24px; margin-bottom: 20px; }
-        .tracker { display: flex; gap: 15px; margin-bottom: 30px; }
-        .circle {
-            width: 40px; height: 40px; border-radius: 50%;
-            border: 2px solid #555; background-color: transparent;
-            transition: all 0.3s ease;
-        }
-        .circle.done { border-color: #00e676; background-color: #00e676; }
-        .btn {
-            background-color: #2979ff; color: white; border: none;
-            padding: 18px 40px; font-size: 20px; font-weight: bold;
-            border-radius: 15px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-        .btn:active { transform: scale(0.95); }
-        
-        /* 타이머 화면 UI */
-        #timer-screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; }
-        .exercise-title { font-size: 32px; font-weight: bold; margin-bottom: 15px; padding: 0 20px; word-break: keep-all; }
-        .exercise-desc { font-size: 16px; color: #b0bec5; margin-bottom: 30px; padding: 0 30px; line-height: 1.4; word-break: keep-all; min-height: 45px; }
-        .time-left { font-size: 120px; font-weight: bold; color: #2979ff; margin-bottom: 20px; }
-        .progress-container { width: 80%; height: 10px; background-color: #333; border-radius: 5px; overflow: hidden; margin-bottom: 40px; }
-        .progress-bar { width: 0%; height: 100%; background-color: #00e676; transition: width 0.3s ease; }
-        
-        /* 이전/다음 컨트롤 버튼 UI */
-        .controls { display: flex; gap: 20px; }
-        .control-btn {
-            padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 10px;
-            border: none; cursor: pointer; color: white;
-        }
-        .control-btn:active { transform: scale(0.95); }
-        .btn-prev { background-color: #444; }
-        .btn-next { background-color: #00e676; color: #121212; min-width: 150px; }
-    </style>
+       /* 기존 CSS 스타일 코드들... */
 </head>
 <body>
 
