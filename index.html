@@ -31,12 +31,20 @@
         /* 타이머 화면 UI */
         #timer-screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; }
         .exercise-title { font-size: 32px; font-weight: bold; margin-bottom: 15px; padding: 0 20px; word-break: keep-all; }
-        /* 새로 추가된 동작 설명 스타일 */
         .exercise-desc { font-size: 16px; color: #b0bec5; margin-bottom: 30px; padding: 0 30px; line-height: 1.4; word-break: keep-all; min-height: 45px; }
+        .time-left { font-size: 120px; font-weight: bold; color: #2979ff; margin-bottom: 20px; }
+        .progress-container { width: 80%; height: 10px; background-color: #333; border-radius: 5px; overflow: hidden; margin-bottom: 40px; }
+        .progress-bar { width: 0%; height: 100%; background-color: #00e676; transition: width 0.3s ease; }
         
-        .time-left { font-size: 120px; font-weight: bold; color: #2979ff; margin-bottom: 40px; }
-        .progress-container { width: 80%; height: 10px; background-color: #333; border-radius: 5px; overflow: hidden; }
-        .progress-bar { width: 0%; height: 100%; background-color: #00e676; transition: width 1s linear; }
+        /* 이전/다음 컨트롤 버튼 UI */
+        .controls { display: flex; gap: 20px; }
+        .control-btn {
+            padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 10px;
+            border: none; cursor: pointer; color: white;
+        }
+        .control-btn:active { transform: scale(0.95); }
+        .btn-prev { background-color: #444; }
+        .btn-next { background-color: #00e676; color: #121212; min-width: 150px; }
     </style>
 </head>
 <body>
@@ -58,17 +66,22 @@
     <div id="timer-screen">
         <p id="step-info" style="color: #aaa; margin-bottom: 10px;">진행 중: 1 / 10</p>
         <div class="exercise-title" id="exercise-name">1. 투턱 만들기</div>
-        <!-- 새로 추가된 동작 설명 영역 -->
         <div class="exercise-desc" id="exercise-desc">정면을 보고 턱을 목 쪽으로 강하게 당겨 '투턱'을 만드세요.</div>
         
         <div class="time-left" id="timer-display">10</div>
+        
         <div class="progress-container">
             <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <!-- 수동 컨트롤 버튼 -->
+        <div class="controls">
+            <button class="control-btn btn-prev" id="prev-btn" onclick="prevExercise()">이전</button>
+            <button class="control-btn btn-next" id="next-btn" onclick="nextExercise()">다음 동작</button>
         </div>
     </div>
 
     <script>
-        // 동작 제목과 상세 설명을 짝지어 배열로 변경
         const exercises = [
             { title: "1. 투턱 만들기", desc: "정면을 보고 턱을 목 쪽으로 강하게 당겨 '투턱'을 만든 후 유지합니다." },
             { title: "2. 오른쪽 목 늘리기", desc: "오른손으로 왼쪽 머리를 잡고 오른쪽으로 지그시 당겨줍니다." },
@@ -129,44 +142,67 @@
             document.getElementById('main-screen').style.display = 'none';
             document.getElementById('timer-screen').style.display = 'flex';
             currentIndex = 0;
-            startExercise();
+            updateExerciseScreen();
         }
 
-        function startExercise() {
+        function updateExerciseScreen() {
             timeLeft = 10;
             document.getElementById('step-info').innerText = `진행 중: ${currentIndex + 1} / 10`;
-            
-            // 제목과 설명을 동시에 화면에 표시
             document.getElementById('exercise-name').innerText = exercises[currentIndex].title;
             document.getElementById('exercise-desc').innerText = exercises[currentIndex].desc;
-            
             document.getElementById('timer-display').innerText = timeLeft;
-            document.getElementById('progress-bar').style.width = `${((currentIndex) / exercises.length) * 100}%`;
+            
+            // 프로그레스 바 업데이트
+            document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / exercises.length) * 100}%`;
 
-            setTimeout(() => {
-                document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / exercises.length) * 100}%`;
-            }, 50);
+            // 버튼 상태 업데이트 (첫 번째 동작에선 '이전' 숨기기, 마지막 동작에선 '완료'로 변경)
+            document.getElementById('prev-btn').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
+            const nextBtn = document.getElementById('next-btn');
+            if (currentIndex === exercises.length - 1) {
+                nextBtn.innerText = "루틴 완료";
+                nextBtn.style.backgroundColor = "#2979ff";
+                nextBtn.style.color = "white";
+            } else {
+                nextBtn.innerText = "다음 동작";
+                nextBtn.style.backgroundColor = "#00e676";
+                nextBtn.style.color = "#121212";
+            }
 
+            // 기존 타이머 클리어 후 재시작
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer-display').innerText = timeLeft;
-
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    playBeep(); 
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    document.getElementById('timer-display').innerText = timeLeft;
                     
-                    if (currentIndex < exercises.length - 1) {
-                        currentIndex++;
-                        startExercise();
-                    } else {
-                        finishRoutine();
+                    if (timeLeft === 0) {
+                        playBeep(); // 0초가 되면 삐 소리가 나지만 다음으로 자동으로 넘어가진 않음
+                        clearInterval(timerInterval);
                     }
                 }
             }, 1000);
         }
 
+        // 사용자가 '이전' 버튼 클릭 시
+        function prevExercise() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateExerciseScreen();
+            }
+        }
+
+        // 사용자가 '다음' 버튼 클릭 시
+        function nextExercise() {
+            if (currentIndex < exercises.length - 1) {
+                currentIndex++;
+                updateExerciseScreen();
+            } else {
+                finishRoutine();
+            }
+        }
+
         function finishRoutine() {
+            clearInterval(timerInterval);
             alert("100초 루틴을 성공적으로 마쳤습니다!");
             if (todayCount < 3) {
                 todayCount++;
