@@ -7,18 +7,53 @@
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#121212">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="거북목탈출">
     <link rel="apple-touch-icon" href="icon.png">
 
     <style>
-       /* 기존 CSS 스타일 코드들... */
+        body {
+            margin: 0; padding: 0;
+            background-color: #121212;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; text-align: center; overflow: hidden;
+        }
+        h1 { font-size: 24px; margin-bottom: 20px; }
+        .tracker { display: flex; gap: 15px; margin-bottom: 30px; }
+        .circle {
+            width: 40px; height: 40px; border-radius: 50%;
+            border: 2px solid #555; background-color: transparent;
+            transition: all 0.3s ease;
+        }
+        .circle.done { border-color: #00e676; background-color: #00e676; }
+        .btn {
+            background-color: #2979ff; color: white; border: none;
+            padding: 18px 40px; font-size: 20px; font-weight: bold;
+            border-radius: 15px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .btn:active { transform: scale(0.95); }
+        
+        #timer-screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; }
+        .exercise-title { font-size: 32px; font-weight: bold; margin-bottom: 15px; padding: 0 20px; word-break: keep-all; }
+        .exercise-desc { font-size: 16px; color: #b0bec5; margin-bottom: 30px; padding: 0 30px; line-height: 1.4; word-break: keep-all; min-height: 45px; }
+        .time-left { font-size: 120px; font-weight: bold; color: #2979ff; margin-bottom: 20px; }
+        .progress-container { width: 80%; height: 10px; background-color: #333; border-radius: 5px; overflow: hidden; margin-bottom: 40px; }
+        .progress-bar { width: 0%; height: 100%; background-color: #00e676; transition: width 0.3s ease; }
+        
+        .controls { display: flex; gap: 20px; }
+        .control-btn {
+            padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 10px;
+            border: none; cursor: pointer; color: white;
+        }
+        .control-btn:active { transform: scale(0.95); }
+        .btn-prev { background-color: #444; }
+        .btn-next { background-color: #00e676; color: #121212; min-width: 150px; }
+    </style>
 </head>
 <body>
-
-    <!-- 메인 화면 -->
     <div id="main-screen">
         <h1>오늘의 3단계 루틴</h1>
         <div class="tracker">
@@ -31,19 +66,14 @@
         <button class="btn" onclick="startRoutine()">100초 거북목 탈출 시작</button>
     </div>
 
-    <!-- 타이머 화면 -->
     <div id="timer-screen">
         <p id="step-info" style="color: #aaa; margin-bottom: 10px;">진행 중: 1 / 10</p>
         <div class="exercise-title" id="exercise-name">1. 투턱 만들기</div>
         <div class="exercise-desc" id="exercise-desc">정면을 보고 턱을 목 쪽으로 강하게 당겨 '투턱'을 만드세요.</div>
-        
         <div class="time-left" id="timer-display">10</div>
-        
         <div class="progress-container">
             <div class="progress-bar" id="progress-bar"></div>
         </div>
-
-        <!-- 수동 컨트롤 버튼 -->
         <div class="controls">
             <button class="control-btn btn-prev" id="prev-btn" onclick="prevExercise()">이전</button>
             <button class="control-btn btn-next" id="next-btn" onclick="nextExercise()">다음 동작</button>
@@ -121,10 +151,8 @@
             document.getElementById('exercise-desc').innerText = exercises[currentIndex].desc;
             document.getElementById('timer-display').innerText = timeLeft;
             
-            // 프로그레스 바 업데이트
             document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / exercises.length) * 100}%`;
 
-            // 버튼 상태 업데이트 (첫 번째 동작에선 '이전' 숨기기, 마지막 동작에선 '완료'로 변경)
             document.getElementById('prev-btn').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
             const nextBtn = document.getElementById('next-btn');
             if (currentIndex === exercises.length - 1) {
@@ -137,22 +165,19 @@
                 nextBtn.style.color = "#121212";
             }
 
-            // 기존 타이머 클리어 후 재시작
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 if (timeLeft > 0) {
                     timeLeft--;
                     document.getElementById('timer-display').innerText = timeLeft;
-                    
                     if (timeLeft === 0) {
-                        playBeep(); // 0초가 되면 삐 소리가 나지만 다음으로 자동으로 넘어가진 않음
+                        playBeep();
                         clearInterval(timerInterval);
                     }
                 }
             }, 1000);
         }
 
-        // 사용자가 '이전' 버튼 클릭 시
         function prevExercise() {
             if (currentIndex > 0) {
                 currentIndex--;
@@ -160,7 +185,6 @@
             }
         }
 
-        // 사용자가 '다음' 버튼 클릭 시
         function nextExercise() {
             if (currentIndex < exercises.length - 1) {
                 currentIndex++;
